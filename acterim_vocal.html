@@ -6,9 +6,7 @@
 <title>ACTERIM — Agent Vocal</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono&display=swap');
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
     font-family: 'DM Sans', sans-serif;
     background: #0a0a0a;
@@ -20,131 +18,45 @@
     justify-content: center;
     padding: 2rem 1rem;
   }
-
-  .logo {
-    font-size: 13px;
-    letter-spacing: 0.15em;
-    color: #555;
-    text-transform: uppercase;
-    margin-bottom: 3rem;
-  }
-
+  .logo { font-size: 13px; letter-spacing: 0.15em; color: #555; text-transform: uppercase; margin-bottom: 3rem; }
   .btn-record {
-    width: 160px;
-    height: 160px;
-    border-radius: 50%;
-    border: 2px solid #333;
-    background: #111;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: all 0.2s;
-    position: relative;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
+    width: 160px; height: 160px; border-radius: 50%;
+    border: 2px solid #333; background: #111; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent; touch-action: manipulation;
   }
-
   .btn-record:active { transform: scale(0.95); }
-
-  .btn-record.recording {
-    border-color: #e74c3c;
-    animation: pulse 1.2s ease-in-out infinite;
-  }
-
+  .btn-record.recording { border-color: #e74c3c; animation: pulse 1.2s ease-in-out infinite; }
   @keyframes pulse {
     0%, 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.3); }
     50% { box-shadow: 0 0 0 20px rgba(231, 76, 60, 0); }
   }
-
-  .mic-icon {
-    font-size: 48px;
-    line-height: 1;
-  }
-
-  .btn-label {
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    color: #555;
-    text-transform: uppercase;
-  }
-
+  .mic-icon { font-size: 48px; line-height: 1; }
+  .btn-label { font-size: 11px; letter-spacing: 0.1em; color: #555; text-transform: uppercase; }
   .btn-record.recording .btn-label { color: #e74c3c; }
-
-  .status {
-    margin-top: 2rem;
-    font-size: 14px;
-    color: #444;
-    min-height: 20px;
-    text-align: center;
-    font-family: 'DM Mono', monospace;
-  }
-
+  .status { margin-top: 2rem; font-size: 14px; color: #444; min-height: 20px; text-align: center; font-family: 'DM Mono', monospace; }
   .status.active { color: #e74c3c; }
   .status.success { color: #2ecc71; }
   .status.error { color: #e74c3c; }
-
   .transcript {
-    margin-top: 1.5rem;
-    width: 100%;
-    max-width: 360px;
-    background: #111;
-    border: 1px solid #222;
-    border-radius: 12px;
-    padding: 1rem 1.2rem;
-    font-size: 14px;
-    color: #888;
-    min-height: 60px;
-    line-height: 1.6;
-    font-style: italic;
-    display: none;
+    margin-top: 1.5rem; width: 100%; max-width: 360px;
+    background: #111; border: 1px solid #222; border-radius: 12px;
+    padding: 1rem 1.2rem; font-size: 14px; color: #ccc;
+    min-height: 80px; line-height: 1.6; display: none;
   }
-
   .transcript.visible { display: block; }
-
   .send-btn {
-    margin-top: 1rem;
-    width: 100%;
-    max-width: 360px;
-    padding: 14px;
-    border-radius: 10px;
-    border: 1px solid #333;
-    background: #1a1a1a;
-    color: #f0f0f0;
-    font-size: 14px;
-    font-family: 'DM Sans', sans-serif;
-    cursor: pointer;
-    letter-spacing: 0.05em;
-    transition: all 0.2s;
-    display: none;
+    margin-top: 1rem; width: 100%; max-width: 360px; padding: 16px;
+    border-radius: 10px; border: 1px solid #2ecc71; background: #0d2b1a;
+    color: #2ecc71; font-size: 15px; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; letter-spacing: 0.05em; transition: all 0.2s; display: none;
   }
-
   .send-btn.visible { display: block; }
-  .send-btn:hover { background: #222; border-color: #444; }
-  .send-btn:active { transform: scale(0.98); }
-
-  .footer {
-    margin-top: 3rem;
-    font-size: 11px;
-    color: #333;
-    letter-spacing: 0.08em;
-    text-align: center;
-  }
-
-  .dot {
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #e74c3c;
-    margin-right: 6px;
-    vertical-align: middle;
-    display: none;
-  }
-  .dot.visible { display: inline-block; animation: blink 1s infinite; }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  .send-btn:active { transform: scale(0.98); background: #1a3d28; }
+  .footer { margin-top: 3rem; font-size: 11px; color: #333; letter-spacing: 0.08em; text-align: center; }
+  .timer { font-size: 12px; color: #e74c3c; font-family: 'DM Mono', monospace; margin-top: 8px; display: none; }
+  .timer.visible { display: block; }
 </style>
 </head>
 <body>
@@ -157,17 +69,17 @@
 </button>
 
 <div class="status" id="status">Prêt à enregistrer</div>
-<span class="dot" id="dot"></span>
+<div class="timer" id="timer">00:00</div>
 
 <div class="transcript" id="transcript"></div>
 
 <button class="send-btn" id="sendBtn" onclick="sendToWebhook()">
-  Envoyer au système →
+  ✓ Envoyer au système
 </button>
 
 <div class="footer">
-  Parlez en français, roumain ou russe<br>
-  Le système comprend les trois langues
+  Parlez librement — pausez autant que vous voulez<br>
+  Français · Roumain · Russe
 </div>
 
 <script>
@@ -176,15 +88,40 @@ const WEBHOOK = 'https://hook.eu1.make.com/hiel8k165yo9i9h3ylmxuvc8hqf3jb';
 let recognition;
 let isRecording = false;
 let finalText = '';
+let interimText = '';
+let timerInterval;
+let seconds = 0;
+let shouldRestart = false;
 
 const btnRecord = document.getElementById('btnRecord');
 const btnLabel = document.getElementById('btnLabel');
 const statusEl = document.getElementById('status');
 const transcriptEl = document.getElementById('transcript');
 const sendBtn = document.getElementById('sendBtn');
-const dot = document.getElementById('dot');
+const timerEl = document.getElementById('timer');
 
-function initRecognition() {
+function formatTime(s) {
+  const m = Math.floor(s / 60).toString().padStart(2, '0');
+  const sec = (s % 60).toString().padStart(2, '0');
+  return m + ':' + sec;
+}
+
+function startTimer() {
+  seconds = 0;
+  timerEl.classList.add('visible');
+  timerEl.textContent = '00:00';
+  timerInterval = setInterval(() => {
+    seconds++;
+    timerEl.textContent = formatTime(seconds);
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerEl.classList.remove('visible');
+}
+
+function createRecognition() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) {
     statusEl.textContent = 'Reconnaissance vocale non supportée';
@@ -192,45 +129,38 @@ function initRecognition() {
     return null;
   }
   const r = new SR();
-  r.continuous = false;
+  r.continuous = true;
   r.interimResults = true;
   r.lang = 'fr-FR';
 
   r.onresult = (e) => {
-    let interim = '';
+    interimText = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
       if (e.results[i].isFinal) {
         finalText += e.results[i][0].transcript + ' ';
       } else {
-        interim += e.results[i][0].transcript;
+        interimText += e.results[i][0].transcript;
       }
     }
-    transcriptEl.textContent = (finalText + interim).trim();
+    transcriptEl.textContent = (finalText + interimText).trim();
     transcriptEl.classList.add('visible');
   };
 
   r.onend = () => {
-    isRecording = false;
-    btnRecord.classList.remove('recording');
-    btnLabel.textContent = 'Appuyer';
-    dot.classList.remove('visible');
-    if (finalText.trim()) {
-      statusEl.textContent = 'Transcription terminée';
-      statusEl.className = 'status success';
-      sendBtn.classList.add('visible');
-    } else {
-      statusEl.textContent = 'Rien enregistré — réessayez';
-      statusEl.className = 'status';
+    if (shouldRestart && isRecording) {
+      try { r.start(); } catch(e) {}
     }
   };
 
   r.onerror = (e) => {
-    isRecording = false;
-    btnRecord.classList.remove('recording');
-    btnLabel.textContent = 'Appuyer';
-    dot.classList.remove('visible');
-    statusEl.textContent = 'Erreur: ' + e.error;
-    statusEl.className = 'status error';
+    if (e.error === 'no-speech' && isRecording) {
+      try { recognition.start(); } catch(err) {}
+      return;
+    }
+    if (e.error !== 'aborted') {
+      statusEl.textContent = 'Erreur micro: ' + e.error;
+      statusEl.className = 'status error';
+    }
   };
 
   return r;
@@ -239,20 +169,39 @@ function initRecognition() {
 function toggleRecord() {
   if (!isRecording) {
     finalText = '';
+    interimText = '';
     transcriptEl.textContent = '';
     transcriptEl.classList.remove('visible');
     sendBtn.classList.remove('visible');
-    recognition = initRecognition();
+
+    recognition = createRecognition();
     if (!recognition) return;
-    recognition.start();
+
+    shouldRestart = true;
     isRecording = true;
+    recognition.start();
+
     btnRecord.classList.add('recording');
     btnLabel.textContent = 'Stop';
-    dot.classList.add('visible');
-    statusEl.textContent = 'Écoute en cours...';
+    statusEl.textContent = 'Écoute en cours — pausez librement';
     statusEl.className = 'status active';
+    startTimer();
   } else {
+    shouldRestart = false;
+    isRecording = false;
     recognition.stop();
+    btnRecord.classList.remove('recording');
+    btnLabel.textContent = 'Appuyer';
+    stopTimer();
+
+    if (finalText.trim()) {
+      statusEl.textContent = 'Transcription terminée';
+      statusEl.className = 'status success';
+      sendBtn.classList.add('visible');
+    } else {
+      statusEl.textContent = 'Rien enregistré — réessayez';
+      statusEl.className = 'status';
+    }
   }
 }
 
@@ -268,25 +217,26 @@ async function sendToWebhook() {
   try {
     await fetch(WEBHOOK, {
       method: 'POST',
+      mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: text })
     });
-    statusEl.textContent = '✓ Enregistré dans le système';
+    statusEl.textContent = '✓ Enregistré dans le tableau';
     statusEl.className = 'status success';
     sendBtn.textContent = 'Envoyé ✓';
     setTimeout(() => {
       sendBtn.classList.remove('visible');
       transcriptEl.classList.remove('visible');
-      sendBtn.textContent = 'Envoyer au système →';
+      sendBtn.textContent = '✓ Envoyer au système';
       sendBtn.disabled = false;
       statusEl.textContent = 'Prêt à enregistrer';
       statusEl.className = 'status';
       finalText = '';
     }, 3000);
   } catch (err) {
-    statusEl.textContent = 'Erreur réseau — réessayez';
+    statusEl.textContent = 'Erreur — réessayez';
     statusEl.className = 'status error';
-    sendBtn.textContent = 'Envoyer au système →';
+    sendBtn.textContent = '✓ Envoyer au système';
     sendBtn.disabled = false;
   }
 }
