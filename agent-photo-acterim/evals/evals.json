@@ -1,0 +1,55 @@
+{
+  "skill_name": "agent-photo-acterim",
+  "evals": [
+    {
+      "id": 1,
+      "name": "extract-chantier-photo",
+      "prompt": "Voici une photo de panneau de chantier prise à Metz. Extrais les entreprises BTP exécutantes et prépare-les pour ajout dans mon fichier Excel ACTERIM. Réponds en JSON.",
+      "expected_output": "JSON array of companies, EXCLUDING architects/BET/SPS/Qualiconsult/mairie/Region. Each entry has societe, telephone, email, code_postal, ville, metier (or null — never 'Autre BTP').",
+      "files": [],
+      "assertions": [
+        {"text": "Output is a valid JSON array", "type": "structural"},
+        {"text": "No entry contains 'Autre BTP' as métier", "type": "content"},
+        {"text": "No architects, BET, OPC, SPS, contrôle technique, mairie, Région, Préfet extracted", "type": "content"},
+        {"text": "Missing métier set to null, not empty string or 'N/A'", "type": "content"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "qualify-naf-filtering",
+      "prompt": "J'ai trois entreprises : ALPHA TP (NAF 4211Z, TP routier), BETA ÉLEC (NAF 4321A, électricité bâtiment, effectif 15, créée 2010, CA 2M€), GAMMA ARCHI (NAF 7111Z, architecte). Lesquelles passent les filtres ACTERIM ?",
+      "expected_output": "Only BETA ÉLEC passes. ALPHA TP rejected (préfixe 42 — TP). GAMMA ARCHI rejected (préfixe 71 — architecte). Explication claire pour chacune.",
+      "files": [],
+      "assertions": [
+        {"text": "BETA ÉLEC identified as VALID target", "type": "content"},
+        {"text": "ALPHA TP rejected with reason mentioning préfixe 42 or TP", "type": "content"},
+        {"text": "GAMMA ARCHI rejected with reason mentioning préfixe 71 or architecte", "type": "content"}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "maintenance-add-naf-code",
+      "prompt": "Je veux ajouter le NAF 4332A (menuiserie bois) comme cible ACTERIM. Quels fichiers dois-je modifier et que dois-je faire après ?",
+      "expected_output": "Mentionne : (1) ajouter '4332A' dans NAF_CIBLE de bot_telegram.py, (2) même chose dans reprocess_excel.py pour cohérence, (3) ajouter mapping dans NAF_TO_METIER ('Menuiserie bois'), (4) re-traiter Excel existant avec reprocess_excel.py pour récupérer entreprises auparavant filtrées à tort.",
+      "files": [],
+      "assertions": [
+        {"text": "Mentions both bot_telegram.py AND reprocess_excel.py", "type": "content"},
+        {"text": "Mentions NAF_TO_METIER mapping update", "type": "content"},
+        {"text": "Recommends re-running reprocess_excel.py", "type": "content"},
+        {"text": "Mentions backup before re-processing", "type": "content"}
+      ]
+    },
+    {
+      "id": 4,
+      "name": "telegram-no-markdown",
+      "prompt": "Le bot a planté avec 'Can't parse entities: can't find end of the entity starting at byte offset 3166' en envoyant la réponse Telegram. Qu'est-ce qui s'est passé et comment fixer ?",
+      "expected_output": "Identifier que c'est parse_mode='Markdown' qui casse à cause de caractères spéciaux (&, _, () dans les noms d'entreprises). Solution : retirer parse_mode, envoyer en texte brut.",
+      "files": [],
+      "assertions": [
+        {"text": "Identifies parse_mode='Markdown' as root cause", "type": "content"},
+        {"text": "Mentions special characters (&, _, parens) in company names", "type": "content"},
+        {"text": "Solution: remove parse_mode / use plain text", "type": "content"}
+      ]
+    }
+  ]
+}
