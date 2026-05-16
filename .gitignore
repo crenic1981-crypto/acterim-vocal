@@ -1,0 +1,7 @@
+credentials/.env
+credentials/*.json
+!credentials/.env.example
+.venv/
+__pycache__/
+*.pyc
+.queue/
