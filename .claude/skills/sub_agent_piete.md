@@ -1,74 +1,89 @@
-# SKILL — Sub-agent Piete v3.0
+# SKILL — Sub-agent Piete v3.2
 
 **Implementare:** `src/sub_agent_piete.py` + `src/piete_sources/` (11 module)
 
 ## Rol
-Scanează 11 surse marchés publics franceze în paralel, filtrează BTP (CPV 45xxx+39xx) atribuite Grand Est, deduplică, returnează JSON la Agent Principal.
+**Reactiv** — nu face scan proactiv. Primit SIREN + societe de la Sub-agent Firme, caută șantierele active ale firmei în 11 surse. Firma NU e exclusă dacă rezultatul e zero.
 
-## Filtre globale
+## Entry point principal
+
+```python
+result = await sub_agent_piete.check_company(siren="394905517", societe="KELLER SAS")
+```
+
+## Criteriu "șantier activ"
+- Marché atribuit firmei
+- Data atribuirii ≥ 3 luni în urmă
+- Șantierul încă în curs (date_attrib + duree > azi)
+- Durată necunoscută → prezumăm 12 luni
+
+## Output
+
+```json
+{
+  "siren": "394905517",
+  "societe": "KELLER SAS",
+  "santiere_active": [{"marche_id":"...","titre":"...","luni_pe_santier":"17 / 24",...}],
+  "nb_santiere_active": 1,
+  "luni_pe_santier_max": "17 / 24",
+  "scan_date": "2026-05-14",
+  "surse_consultate": 11,
+  "surse_eshuate": 2
+}
+```
+Firma fără șantiere → `nb_santiere_active: 0`, `luni_pe_santier_max: "0 / 0"` → rămâne prospect activ.
+
+## Surse (11, paralele)
+
+**Categoria A (API, ~85% acoperire):**
+- BOAMP — search by titulaire (nom société)
+- DECP — search by `titulaire_id LIKE siren%` (cel mai precis)
+- TED Europa — search by SIREN sau nom
+
+**Categoria B (HTML scraping):**
+PLACE · France Marchés · Marchés Sécurisés · AWS · Maximilien · Région GE · La Centrale
+
+**Categoria C (skip dacă 401/403):**
+e-marchespublics.com
+
+## Filtre
 ```python
 CPV_BTP = ["45", "39"]
 GRAND_EST_DEPT = ["08","10","51","52","54","55","57","67","68","88"]
-PERIODE_JOURS = 90
-TYPE_MARCHE = "attribué"
+PERIODE_RECHERCHE_JOURS = 365
+MIN_LUNI_PE_SANTIER = 3
 ```
 
-## Surse — 3 categorii
+## Integrare Agent Principal
 
-### Categoria A — API publice (prioritate maximă)
-| # | Sursă | URL |
-|---|---|---|
-| 1 | BOAMP | boamp-datadila.opendatasoft.com API v2.1 |
-| 2 | DECP | data.economie.gouv.fr decp-v3 |
-| 10 | TED/JOUE | ted.europa.eu API v3 |
+```python
+piete_res = await sub_agent_piete.check_company(siren=siren, societe=societe)
+# Columns Sheets: Santiere_active + Luni_pe_santier
+```
 
-### Categoria B — HTML scraping
-PLACE · France Marchés · Marchés Sécurisés · AWS · Maximilien · Région GE · La Centrale
+## Mode scan global (backward compat)
 
-### Categoria C — Cont opțional (skip dacă 401/403)
-e-marchespublics.com
-
-## Orchestrare
-Toate 11 surse lansate în paralel (`asyncio.gather`). O sursă eșuată → skip silent, restul continuă. Timeout 60s/sursă.
-
-## Deduplicare
-Cheie: `(siren, montant, date_attrib)`. Conflict → prioritate: BOAMP > DECP > TED > restul.
-
-## Consortium
-Fiecare membru extras ca prospect separat.
+```python
+result = await scan_all_sources(jours=90, force=True)
+```
 
 ## Cache
-`data/piete_cache.json` · TTL 6h · `force=True` bypass.
+Dezactivat by default (fresh la fiecare apel). Mode scan: cache 6h.
 
-## Scoring → Principal
-≥3 marchés = +20 · 2 = +15 · 1 = +10 · 0 = neutru.
+## Performance
+15-60s/firmă · batch 5 paralel · timeout 60s/firmă · skip silent la eșec.
 
-## Comenzi
-```python
-await run()                         # scan complet 90 zile
-await run(siren="394905517")        # verificare SIREN specific
-await run(jours=30, force=True)     # 30 zile, bypass cache
+## Comenzi Telegram
 ```
-Telegram: `"Scanare marchés complet"` · `"Verifică marchés KELLER"`
+"Verifică șantiere KELLER"        → check_company din Sheets
+"Șantiere active 394905517"       → check_company direct SIREN
+"Re-verifică toți High score"     → loop pe High → check_company
+```
 
 ## Test
 ```bash
 python test_sub_agent_piete.py
 ```
 
-## Output JSON
-```json
-{
-  "scan_date": "2026-05-14",
-  "periode_jours": 90,
-  "surse_active": 9,
-  "surse_eshuate": 2,
-  "total_marches": 47,
-  "nb": 47,
-  "score_bonus": 20,
-  "marches": [{"marche_id":"BOAMP-...","titre":"...","montant":450000,...}]
-}
-```
-
 ## Reguli inviolabile
-Niciodată scrie în Sheets · surse eșuate = skip silent · doar atribuite · deduplicare obligatorie · Grand Est strict · CPV 45/39 · consortium = toți separat · cache 6h · apel paralel mereu.
+Reactiv (nu scan automat) · firma NU e exclusă dacă zero șantiere · niciodată scrie în Sheets · apel paralel · skip silent la eșec · deduplicare DECP > BOAMP > TED.

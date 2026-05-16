@@ -79,12 +79,16 @@ class Principal:
             site=firme.get("site", ""),
             societe=firme.get("societe", ""),
         )
-        piete_task = sub_agent_piete.run(siren=siren)
+        # Mode réactif: vérifie chantiers actifs de CETTE firme
+        piete_task = sub_agent_piete.check_company(
+            siren=siren, societe=firme.get("societe", "")
+        )
         contacts_res, piete_res = await asyncio.gather(contacts_task, piete_task)
 
         contacts = contacts_res.get("contacts", [])
-        nb_marches = piete_res.get("nb", 0)
-        score, tier = compute_score(firme, contacts, nb_marches)
+        nb_santiere = piete_res.get("nb_santiere_active", 0)
+        luni_santier = piete_res.get("luni_pe_santier_max", "0 / 0")
+        score, tier = compute_score(firme, contacts, nb_santiere)
 
         c1 = contacts[0] if contacts else {}
         flags = list(firme.get("flags", []))
@@ -106,8 +110,9 @@ class Principal:
             c1.get("tel", ""), c1.get("email", ""), "true" if c1.get("wa") else "false",
             c2.get("nom", ""), c2.get("fonction", ""), c2.get("tel", ""),
             firme.get("site", ""), "",
-            score, tier, nb_marches, source,
-            "À qualifier", "Haute" if tier == "High" else ("Moyenne" if tier == "Medium" else "Basse"),
+            score, tier, nb_santiere, luni_santier, luni_santier,
+            source, "À qualifier",
+            "Haute" if tier == "High" else ("Moyenne" if tier == "Medium" else "Basse"),
             "", "",
             fmt_date(), "", fmt_date(),
             "", "",
@@ -122,6 +127,8 @@ class Principal:
             "societe": firme.get("societe"),
             "score": score,
             "tier": tier,
+            "nb_santiere": nb_santiere,
+            "luni_pe_santier": luni_santier,
             "nb_marches": nb_marches,
             "status": "added",
         }
